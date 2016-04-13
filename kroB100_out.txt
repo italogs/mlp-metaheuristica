@@ -1,0 +1,31 @@
+gcc -c -O3 library/mtwist-1.5/mtwist.c
+gcc -c -O3 library/mtwist-1.5/randistrs.c
+echo "Library Compiled" 
+Library Compiled
+g++ -o main main.cpp library/mtwist-1.5/mtwist.o library/mtwist-1.5/randistrs.o -lm -Ofast -Wall
+./main
+NAME:
+kroB100
+TYPE:
+TSP
+COMMENT:
+100-city
+problem
+B
+(Krolak/Felts/Nelson)
+DIMENSION:
+EDGE_WEIGHT_TYPE:
+EUC_2D
+NODE_COORD_SECTION
+EOF
+Opt Lat 603910.000000
+**** Constructive_method1 - START ****
+avg: 1889538.387279 
+Latency: 1159713.738271 gap: -47.93% = ((optLat - lat) / lat) 
+Tempo: 0.008326
+**** Constructive_method1 - END ****
+**** Constructive_method2 - START ****
+4851 
+Constructive_method2: 3327962.896095 gap: -81.85% = ((optLat - lat) / lat) 
+Tempo: 0.000738
+**** Constructive_method2 - END ****

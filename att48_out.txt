@@ -1,0 +1,33 @@
+gcc -c -O3 library/mtwist-1.5/mtwist.c
+gcc -c -O3 library/mtwist-1.5/randistrs.c
+echo "Library Compiled" 
+Library Compiled
+g++ -o main main.cpp library/mtwist-1.5/mtwist.o library/mtwist-1.5/randistrs.o -lm -Ofast -Wall
+./main
+NAME:
+att48
+COMMENT:
+48
+capitals
+of
+the
+US
+(Padberg/Rinaldi)
+TYPE:
+TSP
+DIMENSION:
+EDGE_WEIGHT_TYPE:
+ATT
+NODE_COORD_SECTION
+EOF
+Opt Lat 603910.000000
+**** Constructive_method1 - START ****
+avg: 1000484.237971 
+Latency: 672283.610133 gap: -10.17% = ((optLat - lat) / lat) 
+Tempo: 0.001429
+**** Constructive_method1 - END ****
+**** Constructive_method2 - START ****
+1081 
+Constructive_method2: 1401529.029003 gap: -56.91% = ((optLat - lat) / lat) 
+Tempo: 0.000128
+**** Constructive_method2 - END ****
