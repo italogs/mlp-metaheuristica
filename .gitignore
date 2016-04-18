@@ -2,3 +2,5 @@ outputs/*
 main
 resultados.txt
 mtwist.o
+mtwist.o
+randistrs.o
