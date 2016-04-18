@@ -1,5 +1,5 @@
 all: mtwistlib compile_main
-	./main
+	echo "Everything is done!"
 compile_main:
 	g++ -o main main.cpp library/mtwist-1.5/mtwist.o library/mtwist-1.5/randistrs.o -lm -Ofast -Wall
 
