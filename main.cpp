@@ -54,7 +54,7 @@ double calculateCostSolution(int *solution, int lenSol) {
 bool sortDistances(TList i, TList j) { return (i.cost <= j.cost);}
 bool sortSavings(TList i, TList j) { return (i.cost >= j.cost);}
 
-double Constructive_method2(int maxIterations,int *solution,int lenSol) {
+double constructive_method2(int *solution,int lenSol) {
 	double mlp = DBL_MAX;
 	unsigned int i,j,k;
 	int m,n;
@@ -119,128 +119,115 @@ double Constructive_method2(int maxIterations,int *solution,int lenSol) {
 	return mlp;
 }
 
-double constructive_method1(int maxIterations, int *solution, int lenSol){
-    int i, j, k, l,iter=0;
-    double bestMLP = DBL_MAX , newMLP,accMLP = 0.0;
+double constructive_method1(int *solution, int lenSol){
+    int i, j, k, l;
+    double newMLP;
 
     TList element;
     vector <TList> distances;
     vector <TList> distancesLRC;
-    int *bestSolution = (int *)malloc(sizeof(int)*lenSol);
+
     unsigned int lengthLRC, it;
 
     int origin, destiny;
     
-    for ( iter = 0; iter < maxIterations; iter++) {
+    // for ( iter = 0; iter < maxIterations; iter++) {
 	  	
-	    int numPointsSol = 0;
-	    // printf("inicio\n");
-	    double alpha = (  mt_lrand() % 26) / 100.0;
-	    /* Inicializa lista com todas as arestas e seus respectivos comprimentos (custos) */
-	    for(i = 0; i < lenSol; i++){
-	        for(j = (i + 1); j < lenSol; j++){
-	            element.origin = i;
-	            element.destiny = j;
-	            element.cost = avaliacMatrix[i][j];
-	            distances.push_back(element);
-	        }
-	    }
-	    /* Ordena lista conforme os comprimentos das arestas */
-	    // sort(distances.begin(), distances.end(), sortDistances);
-
-	     sort(distances.begin(), distances.begin()+(distances.size()-1), sortDistances);
-
-	    /* Inicializa a LRC com os pontos mais próximos da origem (depósito), conforme o comprimento das arestas
-	        entres esses pontos (destino) e a origem, e seleciona um ponto na LRC randomicamente */
-	    for(it = 0; it < distances.size(); it++){
-	        if((distances[it].origin == 0) || (distances[it].destiny == 0)){
-	            distancesLRC.push_back(distances[it]);
-	        }
-	    }
-	    if(alpha == 0){
-	        l = 0;
-	    }else{
-	        lengthLRC = ceil(alpha * distancesLRC.size());
-	        l = mt_lrand() % lengthLRC;
-	        
-	    }
-	    
-	    
-	    origin = distancesLRC[l].origin;
-	    destiny = distancesLRC[l].destiny;
-	    
-	    if(destiny == 0){
-	        destiny = origin;
-	        origin = 0;
-	    }
-	    
-	    /* Adiciona os dois primeiros pontos a solução */
-	    solution[0] = origin;
-	    solution[1] = destiny;
-	    numPointsSol = 2;
-	    k = numPointsSol;
-	    // printf("ates while\n");
-	    while(k < lenSol){
-	        distancesLRC.clear();
-	        for(it = 0; it < distances.size(); it++){
-	            if((distances[it].origin == solution[k - 1]) || (distances[it].destiny == solution[k - 1])){
-	                distancesLRC.push_back(distances[it]);
-	            }
-	        }
-
-	        while(distancesLRC.size() > 0){
-	            if(alpha == 0){
-	                l = 0;
-	            }else{
-	                lengthLRC = ceil(alpha * distancesLRC.size());
-	                // l = rand() % lengthLRC;
-	                l = mt_lrand() % lengthLRC;
-	            }
-	            //printf("lengthLRC = %d\n", lengthLRC);
-	            //printf("l = %d\n", l);
-	            origin = distancesLRC[l].origin;
-	            destiny = distancesLRC[l].destiny;
-
-	            if(destiny == solution[k - 1]){
-	                destiny = origin;
-	            }
-
-	            j = 0;
-	            while((j < numPointsSol) && (destiny != solution[j])){
-	                j++;
-	            }
-	            
-	            if(j == numPointsSol){
-	                break;
-	            }else{
-	                distancesLRC.erase(distancesLRC.begin() + l);
-	            }
-	        }
-	        
-	        solution[k] = destiny;
-	        k++;
-	        numPointsSol++;    
-	    }
-
-	    /* Calcula o custo total da solução construida */
-	    newMLP = calculateCostSolution(solution, numPointsSol);
-	    distances.clear();
-	    distancesLRC.clear();
-	    // printf("newMLP %lf\n",newMLP );
-	    if( newMLP < bestMLP) {
-	    	bestMLP = newMLP;
-	    	for(i = 0; i < lenSol; i++)
-	    		bestSolution[i] = solution[i];
-	    }
-	    accMLP +=newMLP;
+    int numPointsSol = 0;
+    // printf("inicio\n");
+    double alpha = (  mt_lrand() % 26) / 100.0;
+    /* Inicializa lista com todas as arestas e seus respectivos comprimentos (custos) */
+    for(i = 0; i < lenSol; i++){
+        for(j = (i + 1); j < lenSol; j++){
+            element.origin = i;
+            element.destiny = j;
+            element.cost = avaliacMatrix[i][j];
+            distances.push_back(element);
+        }
     }
-	for(i = 0; i < lenSol; i++) {
-		solution[i] = bestSolution[i];
-	}
-	constructive_avg = accMLP/(1.0*maxIterations);
-	printf("avg: %lf \n", constructive_avg);
-    free(bestSolution);
-    return bestMLP;
+    /* Ordena lista conforme os comprimentos das arestas */
+    // sort(distances.begin(), distances.end(), sortDistances);
+
+     sort(distances.begin(), distances.begin()+(distances.size()-1), sortDistances);
+
+    /* Inicializa a LRC com os pontos mais próximos da origem (depósito), conforme o comprimento das arestas
+        entres esses pontos (destino) e a origem, e seleciona um ponto na LRC randomicamente */
+    for(it = 0; it < distances.size(); it++){
+        if((distances[it].origin == 0) || (distances[it].destiny == 0)){
+            distancesLRC.push_back(distances[it]);
+        }
+    }
+    if(alpha == 0){
+        l = 0;
+    }else{
+        lengthLRC = ceil(alpha * distancesLRC.size());
+        l = mt_lrand() % lengthLRC;
+        
+    }
+    
+    
+    origin = distancesLRC[l].origin;
+    destiny = distancesLRC[l].destiny;
+    
+    if(destiny == 0){
+        destiny = origin;
+        origin = 0;
+    }
+    
+    /* Adiciona os dois primeiros pontos a solução */
+    solution[0] = origin;
+    solution[1] = destiny;
+    numPointsSol = 2;
+    k = numPointsSol;
+    // printf("ates while\n");
+    while(k < lenSol){
+        distancesLRC.clear();
+        for(it = 0; it < distances.size(); it++){
+            if((distances[it].origin == solution[k - 1]) || (distances[it].destiny == solution[k - 1])){
+                distancesLRC.push_back(distances[it]);
+            }
+        }
+
+        while(distancesLRC.size() > 0){
+            if(alpha == 0){
+                l = 0;
+            }else{
+                lengthLRC = ceil(alpha * distancesLRC.size());
+                // l = rand() % lengthLRC;
+                l = mt_lrand() % lengthLRC;
+            }
+            //printf("lengthLRC = %d\n", lengthLRC);
+            //printf("l = %d\n", l);
+            origin = distancesLRC[l].origin;
+            destiny = distancesLRC[l].destiny;
+
+            if(destiny == solution[k - 1]){
+                destiny = origin;
+            }
+
+            j = 0;
+            while((j < numPointsSol) && (destiny != solution[j])){
+                j++;
+            }
+            
+            if(j == numPointsSol){
+                break;
+            }else{
+                distancesLRC.erase(distancesLRC.begin() + l);
+            }
+        }
+        
+        solution[k] = destiny;
+        k++;
+        numPointsSol++;    
+    }
+
+    /* Calcula o custo total da solução construida */
+    newMLP = calculateCostSolution(solution, numPointsSol);
+    distances.clear();
+    distancesLRC.clear();
+
+    return newMLP;
 }
 
 double swap(int *originalSolution,int *currentSolution,int lenSol,int pivot,int pivot2) {
@@ -314,134 +301,148 @@ double reinsertion(int *originalSolution,int *currentSolution,int lenSol,int piv
 }
 
 
-double local_search_best_improving(int maxIterations, int *originalSolution, int lenSol){
+double ms_local_search_best_improving(int maxIterations, int *bestGlobalSolution, int lenSol){
 	int improvement = TRUE, i,j,k;
-	double currentLat, bestLat, originalLat = calculateCostSolution(originalSolution,lenSol); 
-	int *bestSolution = new int[lenSol], *currentSolution = new int[lenSol];
-	// clock_t cInit,cEnd;
-	while (improvement) {
-		improvement = FALSE;
-		bestLat = DBL_MAX;
-
-		switch( (mt_lrand() % 3) + 1) {
-			case 1:
-				for (i = 1; i < (lenSol - 2); i++) {
-					for (j = (i+1); j < (lenSol - 1); j++) {
-						currentLat = two_opt(originalSolution,currentSolution,lenSol,i,j);
-						if(currentLat < bestLat) {
-							for (k = 0; k < lenSol; k++)
-								bestSolution[k] = currentSolution[k];
-							bestLat = currentLat;
+	double currentLat, neighborLat,bestLat = DBL_MAX,bestGlobalLat = DBL_MAX;
+	int *bestSolution = new int[lenSol], *currentSolution = new int[lenSol], *neighborSolution = new int[lenSol];
+	for (int iter = 0; iter < maxIterations; iter++) {
+		currentLat = constructive_method1(currentSolution,lenSol);
+		improvement = TRUE;
+		while (improvement) {
+			improvement = FALSE;
+			switch( (mt_lrand() % 3) + 1) {
+				case 1:
+					for (i = 1; i < (lenSol - 2); i++) {
+						for (j = (i+1); j < (lenSol - 1); j++) {
+							neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
+							if(neighborLat < bestLat) {
+								for (k = 0; k < lenSol; k++)
+									bestSolution[k] = neighborSolution[k];
+								bestLat = neighborLat;
+							}
 						}
 					}
-				}
-			break;
-			case 2:
-				for (i = 1; i < (lenSol - 1); i++) {
-					for (j = 1; j < (lenSol - 1); j++) {
-						currentLat = reinsertion(originalSolution,currentSolution,lenSol,i,j);
-						if(currentLat < bestLat) {
-							for (k = 0; k < lenSol; k++)
-								bestSolution[k] = currentSolution[k];
-							bestLat = currentLat;
+				break;
+				case 2:
+					for (i = 1; i < (lenSol - 1); i++) {
+						for (j = 1; j < (lenSol - 1); j++) {
+							neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
+							if(neighborLat < bestLat) {
+								for (k = 0; k < lenSol; k++)
+									bestSolution[k] = neighborSolution[k];
+								bestLat = currentLat;
+							}
 						}
 					}
-				}
-
-
-			break;
-			case 3:
-				for(i = 1; i < (lenSol - 2); i++){
-		        	for(j = (i + 1); j < (lenSol - 1); j++){
-						currentLat = swap(originalSolution,currentSolution,lenSol,i,j);
-						if(currentLat < bestLat) {
-							// printf("melhorou\n");
-							for (k = 0; k < lenSol; k++)
-								bestSolution[k] = currentSolution[k];
-							bestLat = currentLat;
+				break;
+				case 3:
+					for(i = 1; i < (lenSol - 2); i++){
+			        	for(j = (i + 1); j < (lenSol - 1); j++){
+							neighborLat = swap(currentSolution,neighborSolution,lenSol,i,j);
+							if(neighborLat < bestLat) {
+								for (k = 0; k < lenSol; k++)
+									bestSolution[k] = neighborSolution[k];
+								bestLat = neighborLat;
+							}
 						}
 					}
-				}
-			break;
-			default:
-			printf("out of range\n");
-				exit(0);
-			break;
+				break;
+				default:
+				printf("out of range\n");
+					exit(0);
+				break;
+			}
+
+			if(bestLat < currentLat) {
+				for (i = 0; i < lenSol; i++)
+					currentSolution[i] = bestSolution[i];
+				currentLat = bestLat;
+				improvement = TRUE;
+			}
 		}
-		if(bestLat < originalLat) {
+
+		if(currentLat < bestGlobalLat) {
 			for (i = 0; i < lenSol; i++)
-				originalSolution[i] = bestSolution[i];
-			originalLat = bestLat;
-			improvement = TRUE;
+				bestGlobalSolution[i] = currentSolution[i];
+			bestGlobalLat = currentLat;
 		}
 	}
+	delete[] neighborSolution;
 	delete[] bestSolution;
 	delete[] currentSolution;
-	return originalLat;
+	return bestGlobalLat;
 }
 
-double local_search_first_improving(int maxIterations, int *originalSolution, int lenSol){
+double ms_local_search_first_improving(int maxIterations, int *bestGlobalSolution, int lenSol){
+
 	int improvement = TRUE, i,j,k;
-	double currentLat, bestLat, originalLat = calculateCostSolution(originalSolution,lenSol); 
-	int *bestSolution = new int[lenSol], *currentSolution = new int[lenSol];
-	for (i = 0; i < lenSol; i++)
-		bestSolution[i] = originalSolution[i];
+	double currentLat, neighborLat,bestGlobalLat = DBL_MAX;
+	int *currentSolution = new int[lenSol], *neighborSolution = new int[lenSol];
 
-	bestLat = originalLat;
-	while (improvement) {
-		improvement = FALSE;
-		switch( (mt_lrand() % 3) + 1) {
-			case 1:
-				for (i = 1; i < (lenSol - 2); i++) {
-					for (j = (i+1); j < (lenSol - 1); j++) {
-						currentLat = two_opt(bestSolution,currentSolution,lenSol,i,j);
-						if(currentLat < bestLat) {
-							for (k = 0; k < lenSol; k++)
-								bestSolution[k] = currentSolution[k];
-							bestLat = currentLat;
-							improvement = TRUE;
+	for (int iter = 0; iter < maxIterations; iter++) {
+		currentLat = constructive_method1(currentSolution,lenSol);
+		improvement = TRUE;
+		while (improvement) {
+			improvement = FALSE;
+			switch( (mt_lrand() % 3) + 1) {
+				case 1:
+					for (i = 1; i < (lenSol - 2); i++) {
+						for (j = (i+1); j < (lenSol - 1); j++) {
+							neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
+							if(neighborLat < currentLat) {
+								for (k = 0; k < lenSol; k++)
+									currentSolution[k] = neighborSolution[k];
+								currentLat = neighborLat;
+								improvement = TRUE;
+							}
 						}
 					}
-				}
-			break;
-			case 2:
-				for (i = 1; i < (lenSol - 1); i++) {
-					for (j = 1; j < (lenSol - 1); j++) {
-						currentLat = reinsertion(bestSolution,currentSolution,lenSol,i,j);
-						if(currentLat < bestLat) {
-							for (k = 0; k < lenSol; k++)
-								bestSolution[k] = currentSolution[k];
-							bestLat = currentLat;
-							improvement = TRUE;
+				break;
+				case 2:
+					for (i = 1; i < (lenSol - 1); i++) {
+						for (j = 1; j < (lenSol - 1); j++) {
+							neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
+							if(neighborLat < currentLat) {
+								for (k = 0; k < lenSol; k++)
+									currentSolution[k] = neighborSolution[k];
+								currentLat = neighborLat;
+								improvement = TRUE;
+							}
 						}
 					}
-				}
 
 
-			break;
-			case 3:
-				for(i = 1; i < (lenSol - 2); i++){
-		        	for(j = (i + 1); j < (lenSol - 1); j++){
-						currentLat = swap(bestSolution,currentSolution,lenSol,i,j);
-						if(currentLat < bestLat) {
-							// printf("melhorou\n");
-							for (k = 0; k < lenSol; k++)
-								bestSolution[k] = currentSolution[k];
-							bestLat = currentLat;
-							improvement = TRUE;
+				break;
+				case 3:
+					for(i = 1; i < (lenSol - 2); i++){
+			        	for(j = (i + 1); j < (lenSol - 1); j++){
+							neighborLat = swap(currentSolution,neighborSolution,lenSol,i,j);
+							if(neighborLat < currentLat) {
+								for (k = 0; k < lenSol; k++)
+									currentSolution[k] = neighborSolution[k];
+								currentLat = neighborLat;
+								improvement = TRUE;
+							}
 						}
 					}
-				}
-			break;
-			default:
-			printf("out of range\n");
-				exit(0);
-			break;
+				break;
+				default:
+				printf("out of range\n");
+					exit(0);
+				break;
+			}
 		}
+
+		if(currentLat < bestGlobalLat) {
+			for (i = 0; i < lenSol; i++)
+				bestGlobalSolution[i] = currentSolution[i];
+			bestGlobalLat = currentLat;
+		}
+
 	}
-	delete[] bestSolution;
+	delete[] neighborSolution;
 	delete[] currentSolution;
-	return originalLat;
+	return bestGlobalLat;
 }
 
 int main(int argc, char *argv[]){
@@ -523,28 +524,15 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 	if(exec == 1) {
-		fprintf(outputFile, "Constructive Method,,Best Improving,,First Improving\n");
-		fprintf(outputFile, "Best,Time,Best,Time,Best,Time\n");
+		fprintf(outputFile, "Best Improving,,First Improving\n");
+		fprintf(outputFile, "Best,Time,Best,Time\n");
 	}
-
-	clock_t cInitConstructive,cEndConstructive;
-	printf("Instancia: %s\n", filenameInput);
-	printf("**** Constructive_method1 - START ****\n");
-	cInitConstructive = clock();
-	double constructive_latency = constructive_method1(maxIterations,solution,lenSol);
-	cEndConstructive = clock();
-	printf("Latency: %lf\n", constructive_latency);
-	double constructive_time = (double)difftime(cEndConstructive, cInitConstructive) / (CLOCKS_PER_SEC);
-	printf("Tempo: %lf\n",constructive_time);
-
-	printf("**** Constructive_method1 - END ****\n");
-
 
 	clock_t cInitBest_Improving,cEndBest_Improving;
 
 	printf("**** local_search_best_improving - START ****\n");
 	cInitBest_Improving = clock();
-	double best_improving_latency = local_search_best_improving(maxIterations,solution,lenSol);
+	double best_improving_latency = ms_local_search_best_improving(maxIterations,solution,lenSol);
 	printf("Latency: %lf \n",best_improving_latency );
 	cEndBest_Improving = clock();
 	double best_improving_time = (double)difftime(cEndBest_Improving, cInitBest_Improving) / (CLOCKS_PER_SEC);
@@ -560,7 +548,7 @@ int main(int argc, char *argv[]){
 	clock_t cInitFirst_Improving,cEndFirst_Improving;
 	printf("**** local_search_first_improving - START ****\n");
 	cInitFirst_Improving = clock();
-	double first_improving_latency = local_search_first_improving(maxIterations,solution,lenSol);
+	double first_improving_latency = ms_local_search_first_improving(maxIterations,solution,lenSol);
 	printf("Latency: %lf \n",first_improving_latency );
 	cEndFirst_Improving = clock();
 	double first_improving_time = (double)difftime(cEndFirst_Improving, cInitFirst_Improving) / (CLOCKS_PER_SEC);
@@ -571,24 +559,12 @@ int main(int argc, char *argv[]){
 	printf("\n");
 	printf("**** local_search_first_improving - END ****\n");
 
-	// "Best,AVG,Time,Best,AVG,Time,Best,AVG,Time
-	fprintf(outputFile, "%lf,%lf,%lf,%lf,%lf,%lf\n",
-			constructive_latency,constructive_time,
+	fprintf(outputFile, "%lf,%lf,%lf,%lf\n",
 			best_improving_latency,best_improving_time,
 			first_improving_latency,first_improving_time);
 	
 	printf("FIM\n");
 	
-	// printf("**** Constructive_method2 - START ****\n");
-
-	// cInit = clock();
-	// lat = Constructive_method2(maxIterations,solution,lenSol);
-	// printf("Constructive_method2: %lf gap: %.2lf%% = ((optLat - lat) / lat) \n", lat, ( optLat - lat )/ lat * 100.0 );
-	// cEnd = clock();
-	// printf("Tempo: %lf\n", (double)difftime(cEnd, cInit) / (CLOCKS_PER_SEC));
-
-	// printf("**** Constructive_method2 - END ****\n");
-
 
 	fclose(inputFile);
 	fclose(outputFile);

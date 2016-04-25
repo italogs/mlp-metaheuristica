@@ -1,12 +1,12 @@
-echo 0 > /sys/devices/system/cpu/cpu4/online
-echo 0 > /sys/devices/system/cpu/cpu5/online
-echo 0 > /sys/devices/system/cpu/cpu6/online
-echo 0 > /sys/devices/system/cpu/cpu7/online
+sudo echo 0 > /sys/devices/system/cpu/cpu4/online
+sudo echo 0 > /sys/devices/system/cpu/cpu5/online
+sudo echo 0 > /sys/devices/system/cpu/cpu6/online
+sudo echo 0 > /sys/devices/system/cpu/cpu7/online
 
 make
 
 NUMEXECS='10'
-INSTANCEPATH='instancias'
+INSTANCEPATH='instancias2'
 OUTPUTPATH='outputs'
 echo "Instances Path: $INSTANCEPATH"
 echo "Output Path: $OUTPUTPATH"
