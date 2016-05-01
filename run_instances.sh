@@ -1,16 +1,15 @@
-sudo echo 0 > /sys/devices/system/cpu/cpu4/online
-sudo echo 0 > /sys/devices/system/cpu/cpu5/online
-sudo echo 0 > /sys/devices/system/cpu/cpu6/online
-sudo echo 0 > /sys/devices/system/cpu/cpu7/online
+
 
 make
 
 NUMEXECS='10'
-INSTANCEPATH='instancias2'
+INSTANCEPATH='instancias'
 OUTPUTPATH='outputs'
 echo "Instances Path: $INSTANCEPATH"
 echo "Output Path: $OUTPUTPATH"
 mkdir -p $OUTPUTPATH
+
+echo "" > $OUTPUTPATH/all_outputs.csv
 
 
 for i in $(ls $INSTANCEPATH); do
@@ -25,7 +24,6 @@ for i in $(ls $INSTANCEPATH); do
 		echo "sudo ./main $INSTANCEFILE $j >> $OUTPUTFILE;";
 		./main $INSTANCEFILE $j >> $OUTPUTFILE;
 		echo "<>End Execution: $j ------------------------------</>" >> $OUTPUTFILE;
-		sleep 1;
 	done
 done
 ###################################################################

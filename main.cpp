@@ -302,62 +302,59 @@ double reinsertion(int *originalSolution,int *currentSolution,int lenSol,int piv
 
 
 double ms_local_search_best_improving(int maxIterations, int *bestGlobalSolution, int lenSol){
-	int improvement = TRUE, i,j,k;
+	int i,j,k;
+	bool improvement_2opt, improvement_reinsertion, improvement_swap;
 	double currentLat, neighborLat,bestLat = DBL_MAX,bestGlobalLat = DBL_MAX;
 	int *bestSolution = new int[lenSol], *currentSolution = new int[lenSol], *neighborSolution = new int[lenSol];
 	for (int iter = 0; iter < maxIterations; iter++) {
 		currentLat = constructive_method1(currentSolution,lenSol);
-		improvement = TRUE;
-		while (improvement) {
-			improvement = FALSE;
-			switch( (mt_lrand() % 3) + 1) {
-				case 1:
-					for (i = 1; i < (lenSol - 2); i++) {
-						for (j = (i+1); j < (lenSol - 1); j++) {
-							neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
-							if(neighborLat < bestLat) {
-								for (k = 0; k < lenSol; k++)
-									bestSolution[k] = neighborSolution[k];
-								bestLat = neighborLat;
-							}
-						}
-					}
-				break;
-				case 2:
-					for (i = 1; i < (lenSol - 1); i++) {
-						for (j = 1; j < (lenSol - 1); j++) {
-							neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
-							if(neighborLat < bestLat) {
-								for (k = 0; k < lenSol; k++)
-									bestSolution[k] = neighborSolution[k];
-								bestLat = currentLat;
-							}
-						}
-					}
-				break;
-				case 3:
-					for(i = 1; i < (lenSol - 2); i++){
-			        	for(j = (i + 1); j < (lenSol - 1); j++){
-							neighborLat = swap(currentSolution,neighborSolution,lenSol,i,j);
-							if(neighborLat < bestLat) {
-								for (k = 0; k < lenSol; k++)
-									bestSolution[k] = neighborSolution[k];
-								bestLat = neighborLat;
-							}
-						}
-					}
-				break;
-				default:
-				printf("out of range\n");
-					exit(0);
-				break;
-			}
 
+		improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+		while (improvement_2opt || improvement_reinsertion || improvement_swap) {
+			if(improvement_swap) {
+				improvement_swap = FALSE;
+				for(i = 1; i < (lenSol - 2); i++){
+		        	for(j = (i + 1); j < (lenSol - 1); j++){
+						neighborLat = swap(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			} else if(improvement_reinsertion) {
+				improvement_reinsertion = FALSE;
+				for (i = 1; i < (lenSol - 1); i++) {
+					for (j = 1; j < (lenSol - 1); j++) {
+						neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			} else if(improvement_2opt) {
+				improvement_2opt = FALSE;
+				for (i = 1; i < (lenSol - 2); i++) {
+					for (j = (i+1); j < (lenSol - 1); j++) {
+						neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			}
 			if(bestLat < currentLat) {
 				for (i = 0; i < lenSol; i++)
 					currentSolution[i] = bestSolution[i];
 				currentLat = bestLat;
-				improvement = TRUE;
 			}
 		}
 
@@ -375,45 +372,17 @@ double ms_local_search_best_improving(int maxIterations, int *bestGlobalSolution
 
 double ms_local_search_first_improving(int maxIterations, int *bestGlobalSolution, int lenSol){
 
-	int improvement = TRUE, i,j,k;
+	int i,j,k;
 	double currentLat, neighborLat,bestGlobalLat = DBL_MAX;
 	int *currentSolution = new int[lenSol], *neighborSolution = new int[lenSol];
-
+	bool improvement_2opt, improvement_reinsertion, improvement_swap;
 	for (int iter = 0; iter < maxIterations; iter++) {
 		currentLat = constructive_method1(currentSolution,lenSol);
-		improvement = TRUE;
-		while (improvement) {
-			improvement = FALSE;
-			switch( (mt_lrand() % 3) + 1) {
-				case 1:
-					for (i = 1; i < (lenSol - 2); i++) {
-						for (j = (i+1); j < (lenSol - 1); j++) {
-							neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
-							if(neighborLat < currentLat) {
-								for (k = 0; k < lenSol; k++)
-									currentSolution[k] = neighborSolution[k];
-								currentLat = neighborLat;
-								improvement = TRUE;
-							}
-						}
-					}
-				break;
-				case 2:
-					for (i = 1; i < (lenSol - 1); i++) {
-						for (j = 1; j < (lenSol - 1); j++) {
-							neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
-							if(neighborLat < currentLat) {
-								for (k = 0; k < lenSol; k++)
-									currentSolution[k] = neighborSolution[k];
-								currentLat = neighborLat;
-								improvement = TRUE;
-							}
-						}
-					}
 
-
-				break;
-				case 3:
+		improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+		while (improvement_2opt || improvement_reinsertion || improvement_swap) {
+			if(improvement_swap) {
+				improvement_swap = FALSE;
 					for(i = 1; i < (lenSol - 2); i++){
 			        	for(j = (i + 1); j < (lenSol - 1); j++){
 							neighborLat = swap(currentSolution,neighborSolution,lenSol,i,j);
@@ -421,15 +390,36 @@ double ms_local_search_first_improving(int maxIterations, int *bestGlobalSolutio
 								for (k = 0; k < lenSol; k++)
 									currentSolution[k] = neighborSolution[k];
 								currentLat = neighborLat;
-								improvement = TRUE;
+								improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
 							}
 						}
 					}
-				break;
-				default:
-				printf("out of range\n");
-					exit(0);
-				break;
+			} else if (improvement_reinsertion) {
+				improvement_reinsertion = FALSE;
+				for (i = 1; i < (lenSol - 1); i++) {
+					for (j = 1; j < (lenSol - 1); j++) {
+						neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < currentLat) {
+							for (k = 0; k < lenSol; k++)
+								currentSolution[k] = neighborSolution[k];
+							currentLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			} else if(improvement_2opt) {
+				improvement_2opt = FALSE;
+				for (i = 1; i < (lenSol - 2); i++) {
+					for (j = (i+1); j < (lenSol - 1); j++) {
+						neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < currentLat) {
+							for (k = 0; k < lenSol; k++)
+								currentSolution[k] = neighborSolution[k];
+							currentLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
 			}
 		}
 
@@ -459,17 +449,22 @@ int main(int argc, char *argv[]){
 		printf("exec must be greater than 0\n");
 		return 0;
 	}
-	mt_seed32new(exec);
 
+	// mt_seed32new(exec);
+	// long seed = time(NULL);
+	long seed = exec;
+
+
+	
 	char filenameInput[128] = "";
 	strcpy(filenameInput,argv[1]);
-
+	printf("Seed %ld \n",seed );
 	FILE *inputFile = fopen(filenameInput,"r");
 	if(inputFile == NULL) {
 		printf("erro ao ler o arquivo\n");
 		exit(0);
 	}
-	int lenSol = 0,i,j, *solution = NULL, maxIterations = 10; 
+	int lenSol = 0,i,j, *solution = NULL, maxIterations = 20; 
 	char str1[256];
 	Vertex *v_vector = NULL;
 	
@@ -509,18 +504,28 @@ int main(int argc, char *argv[]){
 
 	// double optLat = 603910.000;
 	// printf("Opt Lat %lf\n",optLat);
+
+
+
+
 	char filenameOutput[128] = "outputs/";
+
 	strcat(filenameOutput,basename(filenameInput));
 	strcat(filenameOutput,".csv");
 	printf("filenameOutput %s\n", filenameOutput);
+
+	FILE *all_outputsFile = fopen("outputs/all_outputs.csv","a");
 	if(exec == 1) {
 		outputFile = fopen(filenameOutput,"w");
-		
 	} else {
 		outputFile = fopen(filenameOutput,"a");
 	}
 	if(outputFile == NULL) {
 		printf("outputFile is not able to write\n");
+		return 0;
+	}
+	if(all_outputsFile == NULL) {
+		printf("all_outputs is not able to write\n");
 		return 0;
 	}
 	if(exec == 1) {
@@ -529,7 +534,7 @@ int main(int argc, char *argv[]){
 	}
 
 	clock_t cInitBest_Improving,cEndBest_Improving;
-
+	mt_seed32new(seed);
 	printf("**** local_search_best_improving - START ****\n");
 	cInitBest_Improving = clock();
 	double best_improving_latency = ms_local_search_best_improving(maxIterations,solution,lenSol);
@@ -544,7 +549,7 @@ int main(int argc, char *argv[]){
 	printf("**** local_search_best_improving - END ****\n");
 
 
-
+	mt_seed32new(seed);
 	clock_t cInitFirst_Improving,cEndFirst_Improving;
 	printf("**** local_search_first_improving - START ****\n");
 	cInitFirst_Improving = clock();
@@ -562,13 +567,20 @@ int main(int argc, char *argv[]){
 	fprintf(outputFile, "%lf,%lf,%lf,%lf\n",
 			best_improving_latency,best_improving_time,
 			first_improving_latency,first_improving_time);
-	
+
+	fprintf(all_outputsFile, "%s,%lf,%lf,%lf,%lf\n",
+			basename(filenameInput),
+			best_improving_latency,best_improving_time,
+			first_improving_latency,first_improving_time);
+
+
+
 	printf("FIM\n");
 	
 
 	fclose(inputFile);
 	fclose(outputFile);
-
+	fclose(all_outputsFile);
 	for (i = 0; i < lenSol; ++i)
 		free(avaliacMatrix[i]);
 
