@@ -51,7 +51,7 @@ double calculateCostSolution(int *solution, int lenSol) {
 	}
 	return cost;
 }
-bool sortDistances(TList i, TList j) { return (i.cost <= j.cost);}
+bool sortDistances(TList i, TList j) { return (i.cost < j.cost);}
 bool sortSavings(TList i, TList j) { return (i.cost >= j.cost);}
 
 double constructive_method2(int *solution,int lenSol) {
@@ -148,7 +148,7 @@ double constructive_method1(int *solution, int lenSol){
     /* Ordena lista conforme os comprimentos das arestas */
     // sort(distances.begin(), distances.end(), sortDistances);
 
-     sort(distances.begin(), distances.begin()+(distances.size()-1), sortDistances);
+     sort(distances.begin(), distances.end(), sortDistances);
 
     /* Inicializa a LRC com os pontos mais próximos da origem (depósito), conforme o comprimento das arestas
         entres esses pontos (destino) e a origem, e seleciona um ponto na LRC randomicamente */
@@ -229,6 +229,258 @@ double constructive_method1(int *solution, int lenSol){
 
     return newMLP;
 }
+
+
+double constructive_GRASP_1(int *solution, int lenSol){
+    int i, j, k, l;
+    double newMLP;
+
+    TList element;
+    vector <TList> distances;
+    vector <TList> distancesLRC;
+
+    unsigned int lengthLRC, it;
+
+    int origin, destiny;
+    
+    // for ( iter = 0; iter < maxIterations; iter++) {
+	  	
+    int numPointsSol = 0;
+    // printf("inicio\n");
+    double alpha = (  mt_lrand() % 26) / 100.0;
+    /* Inicializa lista com todas as arestas e seus respectivos comprimentos (custos) */
+    for(i = 0; i < lenSol; i++){
+        for(j = (i + 1); j < lenSol; j++){
+            element.origin = i;
+            element.destiny = j;
+            element.cost = avaliacMatrix[i][j];
+            distances.push_back(element);
+        }
+    }
+    /* Ordena lista conforme os comprimentos das arestas */
+    // sort(distances.begin(), distances.end(), sortDistances);
+	sort(distances.begin(), distances.end(), sortDistances);
+
+    /* Inicializa a LRC com os pontos mais próximos da origem (depósito), conforme o comprimento das arestas
+        entres esses pontos (destino) e a origem, e seleciona um ponto na LRC randomicamente */
+    for(it = 0; it < distances.size(); it++){
+        if((distances[it].origin == 0) || (distances[it].destiny == 0)){
+            distancesLRC.push_back(distances[it]);
+        }
+    }
+    if(alpha == 0){
+        l = 0;
+    }else{
+        lengthLRC = ceil(alpha * distancesLRC.size());
+        l = mt_lrand() % lengthLRC;
+        
+    }
+    
+    
+    origin = distancesLRC[l].origin;
+    destiny = distancesLRC[l].destiny;
+    
+    if(destiny == 0){
+        destiny = origin;
+        origin = 0;
+    }
+    
+    /* Adiciona os dois primeiros pontos a solução */
+    solution[0] = origin;
+    solution[1] = destiny;
+    numPointsSol = 2;
+    k = numPointsSol;
+    // printf("ates while\n");
+    while(k < lenSol){
+        distancesLRC.clear();
+        for(it = 0; it < distances.size(); it++){
+            if((distances[it].origin == solution[k - 1]) || (distances[it].destiny == solution[k - 1])){
+                distancesLRC.push_back(distances[it]);
+            }
+        }
+
+        while(distancesLRC.size() > 0){
+            if(alpha == 0){
+                l = 0;
+            }else{
+                lengthLRC = ceil(alpha * distancesLRC.size());
+                // l = rand() % lengthLRC;
+                l = mt_lrand() % lengthLRC;
+            }
+            //printf("lengthLRC = %d\n", lengthLRC);
+            //printf("l = %d\n", l);
+            origin = distancesLRC[l].origin;
+            destiny = distancesLRC[l].destiny;
+
+            if(destiny == solution[k - 1]){
+                destiny = origin;
+            }
+
+            j = 0;
+            while((j < numPointsSol) && (destiny != solution[j])){
+                j++;
+            }
+            
+            if(j == numPointsSol){
+                break;
+            }else{
+                distancesLRC.erase(distancesLRC.begin() + l);
+            }
+        }
+        
+        solution[k] = destiny;
+        k++;
+        numPointsSol++;    
+    }
+
+    /* Calcula o custo total da solução construida */
+    newMLP = calculateCostSolution(solution, numPointsSol);
+    distances.clear();
+    distancesLRC.clear();
+    return newMLP;
+}
+
+
+double constructive_GRASP_2(int *solution, int lenSol){
+    int i, j, k, l;
+    double newMLP;
+
+    TList element;
+    vector <TList> distances;
+    vector <TList> distancesLRC;
+
+    unsigned int lengthLRC, it;
+
+    int origin, destiny;
+    
+    // for ( iter = 0; iter < maxIterations; iter++) {
+	  	
+    int numPointsSol = 0;
+    // printf("inicio\n");
+    double alpha = (  mt_lrand() % 26) / 100.0;
+    // printf("alpha %lf\n",alpha );
+    /* Inicializa lista com todas as arestas e seus respectivos comprimentos (custos) */
+    for(i = 0; i < lenSol; i++){
+        for(j = (i + 1); j < lenSol; j++){
+            element.origin = i;
+            element.destiny = j;
+            element.cost = avaliacMatrix[i][j];
+            distances.push_back(element);
+        }
+    }
+    /* Ordena lista conforme os comprimentos das arestas */
+    // sort(distances.begin(), distances.end(), sortDistances);
+	sort(distances.begin(), distances.end(), sortDistances);
+
+    /* Inicializa a LRC com os pontos mais próximos da origem (depósito), conforme o comprimento das arestas
+        entres esses pontos (destino) e a origem, e seleciona um ponto na LRC randomicamente */
+    for(it = 0; it < distances.size(); it++){
+        if((distances[it].origin == 0) || (distances[it].destiny == 0)){
+            distancesLRC.push_back(distances[it]);
+        }
+    }
+    if(alpha == 0){
+        l = 0;
+    }else{
+        lengthLRC = ceil(alpha * distancesLRC.size());
+        l = mt_lrand() % lengthLRC;
+        
+    }
+    
+    
+    origin = distancesLRC[l].origin;
+    destiny = distancesLRC[l].destiny;
+    
+    if(destiny == 0){
+        destiny = origin;
+        origin = 0;
+    }
+    
+    /* Adiciona os dois primeiros pontos a solução */
+    solution[0] = origin;
+    solution[1] = destiny;
+    numPointsSol = 2;
+    k = numPointsSol;
+    // printf("ates while\n");
+    // double c_min = DBL_MAX, c_max = 0.0;
+    // double threshold;
+    // alpha=0.0;
+    // printf("alpha %lf\n",alpha );
+    // int it1123 =0 ;
+    double c_min = DBL_MAX, c_max = 0.0, threshold;
+    while(k < lenSol){
+        distancesLRC.clear();
+        c_min = DBL_MAX, c_max = 0.0;
+        threshold = 0.0;
+        for(it = 0; it < distances.size(); it++){
+            if((distances[it].origin == solution[k - 1]) || (distances[it].destiny == solution[k - 1])){
+            	if (distances[it].cost < c_min) {
+            		c_min = distances[it].cost;
+            	} else if(distances[it].cost > c_max){
+            		c_max = distances[it].cost;
+            	}
+            }
+        }
+        threshold = c_min + mt_lrand()*(c_max - c_min);
+        // threshold +=0.1;
+        // printf("it1123++; %d\n", it1123);
+        // printf("----\n%lf, %lf, %lf\n",c_min,c_max,threshold );
+        for(it = 0; it < distances.size(); it++){
+            if( 
+            	
+            	((distances[it].origin == solution[k - 1]) || (distances[it].destiny == solution[k - 1]))){
+            	// printf("entrou solution[k-1] %d %d %d %lf\n", solution[k-1],distances[it].origin,distances[it].destiny,distances[it].cost );
+                // printf("distances[it].cost %lf \n",distances[it].cost  );
+
+            	if(distances[it].cost <= threshold) {
+                    // printf("distances[it].cost %lf \n",distances[it].cost  );
+                    distancesLRC.push_back(distances[it]);
+                }
+            }
+        }
+        // printf("alpha %lf distancesLRC.size() %d min %lf max  %lf threshold %lf \n",alpha,(int)distancesLRC.size(), c_min,c_max,  threshold );
+
+        while(distancesLRC.size() > 0){
+            if(alpha == 0){
+                l = 0;
+            }else{
+                lengthLRC = ceil(alpha * distancesLRC.size());
+                // l = rand() % lengthLRC;
+                l = mt_lrand() % lengthLRC;
+            }
+            //printf("lengthLRC = %d\n", lengthLRC);
+            //printf("l = %d\n", l);
+            origin = distancesLRC[l].origin;
+            destiny = distancesLRC[l].destiny;
+
+            if(destiny == solution[k - 1]){
+                destiny = origin;
+            }
+
+            j = 0;
+            while((j < numPointsSol) && (destiny != solution[j])){
+                j++;
+            }
+            
+            if(j == numPointsSol){
+                break;
+            }else{
+                distancesLRC.erase(distancesLRC.begin() + l);
+            }
+        }
+        
+        solution[k] = destiny;
+        k++;
+        numPointsSol++;    
+    }
+
+    /* Calcula o custo total da solução construida */
+    newMLP = calculateCostSolution(solution, numPointsSol);
+    distances.clear();
+    distancesLRC.clear();
+    return newMLP;
+}
+
 
 double swap(int *originalSolution,int *currentSolution,int lenSol,int pivot,int pivot2) {
 	int k,aux;
@@ -435,6 +687,146 @@ double ms_local_search_first_improving(int maxIterations, int *bestGlobalSolutio
 	return bestGlobalLat;
 }
 
+
+double GRASP(int maxIterations,int maxILS,int *bestGlobalSolution,int lenSol){
+	int i,j,k;
+	double currentLat, neighborLat,bestGlobalLat = DBL_MAX,bestLat = DBL_MAX;
+	int *bestSolution = new int[lenSol], *currentSolution = new int[lenSol], *neighborSolution = new int[lenSol];
+	bool improvement_2opt, improvement_reinsertion, improvement_swap;
+	for (int iter = 0; iter < maxIterations; iter++) {
+		currentLat = constructive_GRASP_1(currentSolution,lenSol);
+		printf("constructive_GRASP_1: %lf\n",currentLat);
+		improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+		while (improvement_2opt || improvement_reinsertion || improvement_swap) {
+			if(improvement_swap) {
+				improvement_swap = FALSE;
+				for(i = 1; i < (lenSol - 2); i++){
+		        	for(j = (i + 1); j < (lenSol - 1); j++){
+						neighborLat = swap(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			} else if(improvement_reinsertion) {
+				improvement_reinsertion = FALSE;
+				for (i = 1; i < (lenSol - 1); i++) {
+					for (j = 1; j < (lenSol - 1); j++) {
+						neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			} else if(improvement_2opt) {
+				improvement_2opt = FALSE;
+				for (i = 1; i < (lenSol - 2); i++) {
+					for (j = (i+1); j < (lenSol - 1); j++) {
+						neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			}
+			if(bestLat < currentLat) {
+				for (i = 0; i < lenSol; i++)
+					currentSolution[i] = bestSolution[i];
+				currentLat = bestLat;
+			}
+		}
+		if(currentLat < bestGlobalLat) {
+			for (i = 0; i < lenSol; i++)
+				bestGlobalSolution[i] = currentSolution[i];
+			bestGlobalLat = currentLat;
+		}
+
+	}
+	delete[] neighborSolution;
+	delete[] bestSolution;
+	delete[] currentSolution;
+	return bestGlobalLat;
+}
+
+double GRASP_2(int maxIterations,int maxILS,int *bestGlobalSolution,int lenSol){
+	int i,j,k;
+	double currentLat, neighborLat,bestGlobalLat = DBL_MAX,bestLat = DBL_MAX;
+	int *bestSolution = new int[lenSol], *currentSolution = new int[lenSol], *neighborSolution = new int[lenSol];
+	bool improvement_2opt, improvement_reinsertion, improvement_swap;
+	for (int iter = 0; iter < maxIterations; iter++) {
+		// printf("iter %d\n", iter );
+		currentLat = constructive_GRASP_2(currentSolution,lenSol);
+		printf("constructive_GRASP_2: %lf\n",currentLat);
+		improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+		while (improvement_2opt || improvement_reinsertion || improvement_swap) {
+			if(improvement_swap) {
+				improvement_swap = FALSE;
+				for(i = 1; i < (lenSol - 2); i++){
+		        	for(j = (i + 1); j < (lenSol - 1); j++){
+						neighborLat = swap(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			} else if(improvement_reinsertion) {
+				improvement_reinsertion = FALSE;
+				for (i = 1; i < (lenSol - 1); i++) {
+					for (j = 1; j < (lenSol - 1); j++) {
+						neighborLat = reinsertion(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			} else if(improvement_2opt) {
+				improvement_2opt = FALSE;
+				for (i = 1; i < (lenSol - 2); i++) {
+					for (j = (i+1); j < (lenSol - 1); j++) {
+						neighborLat = two_opt(currentSolution,neighborSolution,lenSol,i,j);
+						if(neighborLat < bestLat) {
+							for (k = 0; k < lenSol; k++)
+								bestSolution[k] = neighborSolution[k];
+							bestLat = neighborLat;
+							improvement_2opt = improvement_reinsertion = improvement_swap = TRUE;
+						}
+					}
+				}
+			}
+			if(bestLat < currentLat) {
+				for (i = 0; i < lenSol; i++)
+					currentSolution[i] = bestSolution[i];
+				currentLat = bestLat;
+			}
+		}
+		if(currentLat < bestGlobalLat) {
+			for (i = 0; i < lenSol; i++)
+				bestGlobalSolution[i] = currentSolution[i];
+			bestGlobalLat = currentLat;
+		}
+
+	}
+	delete[] neighborSolution;
+	delete[] bestSolution;
+	delete[] currentSolution;
+	return bestGlobalLat;
+}
+
 int main(int argc, char *argv[]){
 	
 	int exec = 1;
@@ -502,11 +894,6 @@ int main(int argc, char *argv[]){
 		for (j = 0; j < lenSol; ++j)
 			avaliacMatrix[i][j] = calculate_EUC_2D(v_vector[i],v_vector[j]);
 
-	// double optLat = 603910.000;
-	// printf("Opt Lat %lf\n",optLat);
-
-
-
 
 	char filenameOutput[128] = "outputs/";
 
@@ -529,15 +916,16 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 	if(exec == 1) {
-		fprintf(outputFile, "Best Improving,,First Improving\n");
-		fprintf(outputFile, "Best,Time,Best,Time\n");
+		fprintf(outputFile, "Best Improving,,First Improving,,GRASP,,GRASP-ADAPT\n");
+		fprintf(outputFile, "Best,Time,Best,Time,Best,Time,Best,Time\n");
 	}
 
 	clock_t cInitBest_Improving,cEndBest_Improving;
 	mt_seed32new(seed);
 	printf("**** local_search_best_improving - START ****\n");
 	cInitBest_Improving = clock();
-	double best_improving_latency = ms_local_search_best_improving(maxIterations,solution,lenSol);
+	double best_improving_latency = 0.0;
+	// best_improving_latency = ms_local_search_best_improving(maxIterations,solution,lenSol);
 	printf("Latency: %lf \n",best_improving_latency );
 	cEndBest_Improving = clock();
 	double best_improving_time = (double)difftime(cEndBest_Improving, cInitBest_Improving) / (CLOCKS_PER_SEC);
@@ -553,7 +941,8 @@ int main(int argc, char *argv[]){
 	clock_t cInitFirst_Improving,cEndFirst_Improving;
 	printf("**** local_search_first_improving - START ****\n");
 	cInitFirst_Improving = clock();
-	double first_improving_latency = ms_local_search_first_improving(maxIterations,solution,lenSol);
+	double first_improving_latency = 0.0;
+	// first_improving_latency = ms_local_search_first_improving(maxIterations,solution,lenSol);
 	printf("Latency: %lf \n",first_improving_latency );
 	cEndFirst_Improving = clock();
 	double first_improving_time = (double)difftime(cEndFirst_Improving, cInitFirst_Improving) / (CLOCKS_PER_SEC);
@@ -564,16 +953,50 @@ int main(int argc, char *argv[]){
 	printf("\n");
 	printf("**** local_search_first_improving - END ****\n");
 
-	fprintf(outputFile, "%lf,%lf,%lf,%lf\n",
-			best_improving_latency,best_improving_time,
-			first_improving_latency,first_improving_time);
+	mt_seed32new(seed);
+	clock_t cInitGRASP,cEndGRASP;
+	printf("**** GRASP - START ****\n");
+	cInitGRASP = clock();
+	double GRASP_latency = GRASP(maxIterations,100,solution,lenSol);
+	printf("Latency: %lf \n",GRASP_latency );
+	cEndGRASP = clock();
+	double GRASP_time = (double)difftime(cEndGRASP, cInitGRASP) / (CLOCKS_PER_SEC);
+	printf("Tempo: %lf\n",GRASP_time );
+	for (i = 0; i < lenSol; ++i) {
+		printf("%d ", solution[i] );
+	}
+	printf("\n");
+	printf("**** GRASP - END ****\n");
 
-	fprintf(all_outputsFile, "%s,%lf,%lf,%lf,%lf\n",
+	mt_seed32new(seed);
+	clock_t cInitGRASP_2,cEndGRASP_2;
+	printf("**** GRASP_2 - START ****\n");
+	cInitGRASP_2 = clock();
+	double GRASP_2_latency = GRASP_2(maxIterations,100,solution,lenSol);
+	printf("Latency: %lf \n",GRASP_2_latency );
+	cEndGRASP_2 = clock();
+	double GRASP_2_time = (double)difftime(cEndGRASP_2, cInitGRASP_2) / (CLOCKS_PER_SEC);
+	printf("Tempo: %lf\n",GRASP_2_time );
+	for (i = 0; i < lenSol; ++i) {
+		printf("%d ", solution[i] );
+	}
+	printf("\n");
+	printf("**** GRASP_2 - END ****\n");
+
+
+
+	fprintf(outputFile, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+			best_improving_latency,best_improving_time,
+			first_improving_latency,first_improving_time,
+			GRASP_latency,GRASP_time,
+			GRASP_2_latency,GRASP_2_time);
+
+	fprintf(all_outputsFile, "%s,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
 			basename(filenameInput),
 			best_improving_latency,best_improving_time,
-			first_improving_latency,first_improving_time);
-
-
+			first_improving_latency,first_improving_time,
+			GRASP_latency,GRASP_time,
+			GRASP_2_latency,GRASP_2_time);
 
 	printf("FIM\n");
 	

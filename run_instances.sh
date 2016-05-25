@@ -1,5 +1,5 @@
 
-
+make clean
 make
 
 NUMEXECS='10'
@@ -11,6 +11,7 @@ mkdir -p $OUTPUTPATH
 
 echo "" > $OUTPUTPATH/all_outputs.csv
 
+# ./main 'instancias/att48.tsp' 3 
 
 for i in $(ls $INSTANCEPATH); do
 	INSTANCEFILE=$INSTANCEPATH/$i;
